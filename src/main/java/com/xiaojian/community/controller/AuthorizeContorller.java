@@ -4,6 +4,7 @@ import com.xiaojian.community.dto.AccessTokenDTO;
 import com.xiaojian.community.dto.GithubUser;
 import com.xiaojian.community.provider.GitHubProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,14 +16,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AuthorizeContorller {
     @Autowired
     private GitHubProvider gitHubProvider;
+    @Value("${github.Client_id}")
+    private String clientId;
+    @Value("${github.setRedirect_uri}")
+    private String uri;
+    @Value("${github.Client_secret}")
+    private String clientSecret;
+
     @GetMapping("/callback")
     public String calBack(@RequestParam(name="code") String code, @RequestParam(name="state") String state){
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         accessTokenDTO.setCode(code);
         accessTokenDTO.setState(state);
-        accessTokenDTO.setRedirect_uri("http://localhost:8887/callback");
-        accessTokenDTO.setClient_id("41906e95e453e7a05abb");
-        accessTokenDTO.setClient_secret("eb108d62c6c13713455f1717cd418c92fb73ae96");
+        accessTokenDTO.setRedirect_uri(uri);
+        accessTokenDTO.setClient_id(clientId);
+        accessTokenDTO.setClient_secret(clientSecret);
         String token = gitHubProvider.getAccessToken(accessTokenDTO);
         System.out.println(token);
         GithubUser githubUser = gitHubProvider.getUser(token);
